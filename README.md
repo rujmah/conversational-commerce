@@ -67,6 +67,11 @@ cp .env.example .env.local
 OPENAI_API_KEY=your_openai_api_key_here
 ```
 
+4. (Optional) Configure SSE API Key authentication:
+```
+SSE_API_KEY=your_secure_api_key_here
+```
+
 ### Development
 
 Start the development server with Turbopack:
@@ -89,6 +94,7 @@ The chat interface will be available at [http://localhost:3000](http://localhost
 - **URL**: `/api/sse`
 - **Method**: POST  
 - **Content-Type**: `text/event-stream`
+- **Authentication**: Optional API key via `x-api-key` header
 - **Usage**: Traditional SSE endpoint for external integrations
 - **Demo**: Available at [http://localhost:3000/sse-demo](http://localhost:3000/sse-demo)
 
@@ -106,6 +112,28 @@ curl -X POST http://localhost:3000/api/sse \
   -H "Content-Type: application/json" \
   -d '{"message": "Where is my order R156998803 for mobile.developer+22@on-running.com?"}'
 ```
+
+**Example SSE Request with API Key:**
+```bash
+curl -X POST http://localhost:3000/api/sse \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your_api_key_here" \
+  -d '{"message": "Where is my order R156998803 for mobile.developer+22@on-running.com?"}'
+```
+
+## Security
+
+### SSE API Key Authentication
+
+The SSE endpoint supports optional API key authentication:
+
+- **Purpose**: Secure external access to the SSE endpoint
+- **Configuration**: Set `SSE_API_KEY` in your environment variables
+- **Usage**: Include `x-api-key` header in requests
+- **Behavior**: 
+  - If `SSE_API_KEY` is not set, no authentication is required
+  - If `SSE_API_KEY` is set, requests without valid key return 401 Unauthorized
+- **Security Note**: The demo interface includes API key input for testing, but this exposes keys in the browser. For production, use server-side authentication or session-based tokens.
 
 ### Build for Production
 

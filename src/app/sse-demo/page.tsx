@@ -7,8 +7,10 @@ import { Card } from "@/components/ui/card";
 export default function SSEDemo() {
   const [messages, setMessages] = useState<string[]>([]);
   const [input, setInput] = useState("");
+  const [apiKey, setApiKey] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const inputId = useId();
+  const apiKeyId = useId();
 
   const connectSSE = async () => {
     if (!input.trim()) return;
@@ -17,13 +19,26 @@ export default function SSEDemo() {
     setIsConnected(true);
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      if (apiKey.trim()) {
+        headers["x-api-key"] = apiKey.trim();
+      }
+
       const response = await fetch("/api/sse", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({ message: input }),
       });
+
+      if (!response.ok) {
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
 
       if (!response.body) {
         throw new Error("No response body");
@@ -101,6 +116,34 @@ export default function SSEDemo() {
           <div className="space-y-4">
             <div>
               <label
+                htmlFor={apiKeyId}
+                className="block text-sm font-medium mb-2"
+              >
+                API Key (optional - leave empty if SSE_API_KEY not configured)
+              </label>
+              <div className="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                <div className="flex items-start gap-2">
+                  <span className="text-yellow-600 font-bold text-sm">⚠️</span>
+                  <div className="text-yellow-800 text-xs">
+                    <strong>Security Warning:</strong> This demo exposes API
+                    keys in the browser. Only use for development/testing. For
+                    production, implement server-side authentication or use
+                    session-based tokens instead of raw API keys.
+                  </div>
+                </div>
+              </div>
+              <input
+                id={apiKeyId}
+                type="password"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="Enter API key if required..."
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary mb-4"
+                disabled={isConnected}
+              />
+            </div>
+            <div>
+              <label
                 htmlFor={inputId}
                 className="block text-sm font-medium mb-2"
               >
@@ -162,6 +205,9 @@ export default function SSEDemo() {
               <strong>Content-Type:</strong> text/event-stream
             </p>
             <p>
+              <strong>Authentication:</strong> x-api-key header (optional)
+            </p>
+            <p>
               <strong>Event Types:</strong>
             </p>
             <ul className="list-disc list-inside ml-4 space-y-1">
@@ -184,6 +230,29 @@ export default function SSEDemo() {
                 <code>[DONE]</code> - Final termination signal
               </li>
             </ul>
+
+            <div className="mt-4 p-4 bg-muted rounded-lg">
+              <h4 className="font-semibold mb-2">cURL Example with API Key:</h4>
+              <code className="text-xs block whitespace-pre-wrap">
+                {`curl -X POST http://localhost:3000/api/sse \\
+  -H "Content-Type: application/json" \\
+  -H "x-api-key: your_api_key_here" \\
+  -d '{"message": "Where is my order R156998803?"}' \\
+  --no-buffer`}
+              </code>
+
+              <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded">
+                <div className="flex items-start gap-2">
+                  <span className="text-red-600 font-bold text-sm">🔒</span>
+                  <div className="text-red-800 text-xs">
+                    <strong>Production Security:</strong> Never expose API keys
+                    in client-side code. Use server-side proxies, environment
+                    variables, or secure authentication flows for production
+                    deployments.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </Card>
       </div>

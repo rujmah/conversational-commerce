@@ -3,12 +3,16 @@
 This file contains project-specific preferences and context for Claude Code sessions.
 
 ## Project Overview
-- **Name**: Degu IO Boilerplate
-- **Type**: Next.js boilerplate with modern tooling
-- **Repository**: https://github.com/degu-io/nextjs-biome-boilerplate
+- **Name**: Conversational Commerce AI Assistant
+- **Type**: AI-powered order status assistant with chat and SSE endpoints
+- **Base**: Next.js 15 boilerplate with modern tooling
+- **AI Integration**: OpenAI GPT-4 with function calling for order lookup
 
 ## Tech Stack
 - **Framework**: Next.js 15 with React 19
+- **AI**: OpenAI GPT-4 with AI SDK (Vercel)
+- **Data**: GraphQL integration for order status
+- **Streaming**: Server-Sent Events (SSE) + AI SDK streaming
 - **Styling**: TailwindCSS 4 + shadcn/ui components
 - **Theming**: next-themes (dark/light/system modes)
 - **Linting/Formatting**: Biome
@@ -39,6 +43,8 @@ This file contains project-specific preferences and context for Claude Code sess
 - Theme switching via ThemeSwitcher component
 - Proper component composition with asChild pattern
 - TypeScript strict typing for all components
+- AI SDK integration with `useChat` hook for streaming
+- SSE event handling with proper error boundaries
 
 ### Testing Strategy
 - Comprehensive test coverage for all features
@@ -63,15 +69,24 @@ This file contains project-specific preferences and context for Claude Code sess
 ```
 src/
 ├── app/                 # Next.js App Router
+│   ├── api/            # API routes
+│   │   ├── chat/stream/ # AI SDK streaming endpoint
+│   │   └── sse/        # Traditional SSE endpoint
+│   ├── chat/           # Chat interface page
+│   ├── sse-demo/       # SSE testing interface
 │   ├── layout.tsx      # Root layout with ThemeProvider
-│   ├── page.tsx        # Home page (client component)
+│   ├── page.tsx        # Landing page with navigation
 │   └── globals.css     # Global styles
 ├── components/         # React components
 │   ├── ui/            # shadcn/ui components
+│   ├── chat/          # Chat interface components
 │   ├── theme-provider.tsx
 │   └── theme-switcher.tsx
-└── lib/
-    └── utils.ts       # cn utility for class merging
+├── lib/
+│   ├── utils.ts       # cn utility for class merging
+│   └── graphql.ts     # GraphQL integration
+└── types/
+    └── index.ts       # TypeScript type definitions
 
 test/                  # Vitest tests
 ├── setup.ts          # Test configuration and mocks
@@ -87,10 +102,31 @@ test/                  # Vitest tests
 - `pnpm test:ui` - Interactive test UI
 
 ## Project-Specific Notes
-- Home page uses useRef for smooth scrolling to sections
-- Theme switcher positioned top-right on mobile
-- All external links open in new tabs with proper rel attributes
-- GitHub repository link in Learn More button
-- Mobile-optimized responsive breakpoints: sm, lg
-- Maximum viewport scale set to 5 (changed from 1)
-- All shadcn/ui components cleaned up - only using necessary ones
+
+### Application Architecture
+- Landing page with navigation to chat and SSE demo interfaces
+- Dual endpoint approach: AI SDK streaming + traditional SSE
+- GraphQL integration for real order data from staging API
+- OpenAI function calling for intelligent order lookup
+
+### API Endpoints
+- `/api/chat/stream` - AI SDK streaming for React chat interface
+- `/api/sse` - Traditional SSE with optional API key authentication
+- SSE endpoint supports `x-api-key` header for external integrations
+- Both endpoints use same OpenAI model and order lookup tools
+
+### Security Features
+- Optional SSE API key authentication via environment variable
+- Security warnings in demo interface about client-side key exposure
+- Production recommendations for server-side authentication
+
+### Environment Variables
+- `OPENAI_API_KEY` - Required for AI functionality
+- `GRAPHQL_ENDPOINT` - Optional, defaults to staging API
+- `SSE_API_KEY` - Optional, enables API key auth for SSE endpoint
+
+### Testing & Quality
+- All components tested with Vitest and React Testing Library
+- Comprehensive test coverage for chat interface and API routes
+- Browser API mocks for JSDOM compatibility (scrollIntoView, etc.)
+- Biome linting with automatic fixes

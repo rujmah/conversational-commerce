@@ -55,6 +55,26 @@ const orderStatusTool = tool({
 export async function POST(req: Request) {
   console.log("🌊 SSE: Starting Server-Sent Events stream");
 
+  // Check for API key authentication
+  const apiKey =
+    req.headers.get("x-api-key") ||
+    req.headers.get("authorization")?.replace("Bearer ", "");
+  const requiredApiKey = process.env.SSE_API_KEY;
+
+  if (requiredApiKey && apiKey !== requiredApiKey) {
+    console.log("🔐 SSE: Unauthorized - Invalid or missing API key");
+    return new Response(
+      JSON.stringify({ error: "Unauthorized - Invalid or missing API key" }),
+      {
+        status: 401,
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      },
+    );
+  }
+
   const { message } = await req.json();
   console.log("🔍 SSE: Received message:", message);
 
@@ -164,7 +184,7 @@ export async function OPTIONS() {
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "POST, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Allow-Headers": "Content-Type, x-api-key, authorization",
     },
   });
 }
