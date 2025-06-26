@@ -14,8 +14,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Degu IO Boilerplate",
-  description: "Next.js with Biome, Lefthook and TailwindCSS/Shadcn UI",
+  title: "Conversational Commerce AI",
+  description:
+    "AI-powered order status assistant with real-time chat and SSE API endpoints. Built with OpenAI GPT-4, GraphQL integration, and modern streaming technologies.",
+  keywords: [
+    "AI",
+    "chatbot",
+    "order status",
+    "SSE",
+    "streaming",
+    "OpenAI",
+    "customer service",
+  ],
+  authors: [{ name: "Conversational Commerce AI" }],
+  openGraph: {
+    title: "Conversational Commerce AI",
+    description:
+      "AI-powered order status assistant with real-time capabilities",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {

@@ -1,67 +1,33 @@
-// test landing page with vitest
-
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import Home from "@/app/page";
+import { describe, expect, it } from "vitest";
+import LandingPage from "@/app/page";
 
-describe("LandingPage", () => {
-	it("should render basic content", () => {
-		render(<Home />);
-		expect(screen.getByText("Degu IO Boilerplate")).toBeInTheDocument();
-		expect(screen.queryByText("Electric Boogaloo")).not.toBeInTheDocument();
-		expect(screen.getByTestId("features")).toBeInTheDocument();
-	});
+describe("Landing Page", () => {
+  it("renders landing page with navigation options", () => {
+    render(<LandingPage />);
 
-	it("should render shadcn Card components for features", () => {
-		render(<Home />);
-		expect(screen.getByTestId("features-card")).toBeInTheDocument();
-	});
+    expect(screen.getByText("Conversational Commerce AI")).toBeInTheDocument();
+    expect(screen.getByText("Choose Your Experience")).toBeInTheDocument();
+  });
 
-	it("should render shadcn Button components", () => {
-		render(<Home />);
-		expect(screen.getByRole("link", { name: /learn more/i })).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /get started/i })).toBeInTheDocument();
-	});
+  it("renders chat interface option", () => {
+    render(<LandingPage />);
 
-	it("should render technology badges", () => {
-		render(<Home />);
-		expect(screen.getAllByText("Next.js 15")).toHaveLength(2); // badge and list item
-		expect(screen.getAllByText("React 19")).toHaveLength(2);
-		expect(screen.getAllByText("TypeScript")).toHaveLength(2);
-	});
+    expect(screen.getByText("💬 Interactive Chat")).toBeInTheDocument();
+    expect(screen.getByText("Launch Chat Interface")).toBeInTheDocument();
+  });
 
-	it("should have interactive buttons and links", async () => {
-		const user = userEvent.setup();
-		render(<Home />);
-		
-		const learnMoreLink = screen.getByRole("link", { name: /learn more/i });
-		expect(learnMoreLink).toHaveAttribute("href", "https://github.com/degu-io/nextjs-biome-boilerplate");
-		expect(learnMoreLink).toHaveAttribute("target", "_blank");
-		
-		const getStartedButton = screen.getByRole("button", { name: /get started/i });
-		await user.click(getStartedButton);
-		// Button should be clickable without throwing
-	});
+  it("renders SSE demo option", () => {
+    render(<LandingPage />);
 
-	it("should render separator between sections", () => {
-		render(<Home />);
-		expect(screen.getByTestId("features-separator")).toBeInTheDocument();
-	});
+    expect(screen.getByText("🌊 SSE Endpoint Demo")).toBeInTheDocument();
+    expect(screen.getByText("View SSE Demo")).toBeInTheDocument();
+  });
 
-	it("should render theme switcher button", () => {
-		render(<Home />);
-		expect(screen.getByRole("button", { name: /toggle theme/i })).toBeInTheDocument();
-	});
+  it("renders technical overview", () => {
+    render(<LandingPage />);
 
-	it("should open theme switcher dropdown when clicked", async () => {
-		const user = userEvent.setup();
-		render(<Home />);
-		
-		const themeSwitcher = screen.getByRole("button", { name: /toggle theme/i });
-		await user.click(themeSwitcher);
-		
-		expect(screen.getByText("Light")).toBeInTheDocument();
-		expect(screen.getByText("Dark")).toBeInTheDocument();
-		expect(screen.getByText("System")).toBeInTheDocument();
-	});
+    expect(screen.getByText("Technical Overview")).toBeInTheDocument();
+    expect(screen.getByText("OpenAI GPT-4")).toBeInTheDocument();
+  });
 });

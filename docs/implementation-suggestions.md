@@ -28,7 +28,7 @@ This document outlines implementation approaches for building an AI-powered orde
 ```
 
 #### Key Technologies:
-- **AI SDK**: Vercel AI SDK for OpenAI integration and streaming
+- **AI SDK**: @ai-sdk/react for client-side hooks, ai for server-side streaming
 - **GraphQL**: Apollo Client for order status queries
 - **Validation**: Zod for input validation
 - **Rate Limiting**: Consider implementing for production use
@@ -55,17 +55,16 @@ const orderStatusTool = {
 ```
 src/components/
 ├── chat/
-│   ├── chat-interface.tsx      # Main chat container
-│   ├── message-list.tsx        # Messages display
-│   ├── message-input.tsx       # Input field with send button
-│   └── typing-indicator.tsx    # Loading states
+│   ├── chat-interface.tsx      # Main chat container with useChat hook
+│   ├── message-list.tsx        # Messages display with status-based loading
+│   └── message-input.tsx       # Input field with send button
 ├── order/
 │   └── order-status-card.tsx   # Order info display
 └── ui/ (existing shadcn components)
 ```
 
 #### Key Features:
-- **Real-time Streaming**: EventSource API for SSE consumption
+- **Real-time Streaming**: useChat hook with status-based loading states (`status === "submitted" || status === "streaming"`)
 - **Message History**: Local state management for conversation
 - **Order Display**: Structured order information presentation
 - **Error Handling**: Graceful error states and retry mechanisms
@@ -162,11 +161,12 @@ const ORDER_STATUS_QUERY = gql`
 ```json
 {
   "dependencies": {
-    "@ai-sdk/openai": "^0.0.66",
-    "ai": "^3.4.32",
-    "@apollo/client": "^3.11.8",
-    "graphql": "^16.9.0",
-    "zod": "^3.23.8"
+    "@ai-sdk/openai": "^1.3.22",
+    "@ai-sdk/react": "^1.2.12", 
+    "ai": "^4.3.16",
+    "@apollo/client": "^3.13.8",
+    "graphql": "^16.11.0",
+    "zod": "^3.25.67"
   }
 }
 ```
@@ -228,3 +228,14 @@ GRAPHQL_ENDPOINT=https://graphql-staging.on.com
 - Maintains existing theme support (dark/light mode)
 - Follows project's TypeScript strict mode requirements
 - Aligns with existing testing setup using Vitest
+
+## Status Management
+
+The chat interface uses the AI SDK's `status` values for managing loading states:
+
+- **`"submitted"`** - Message sent to API, awaiting response stream start
+- **`"streaming"`** - Response actively streaming from API  
+- **`"ready"`** - Full response received, ready for new user message
+- **`"error"`** - Error occurred during API request
+
+**Loading Logic:** `isLoading = status === "submitted" || status === "streaming"`

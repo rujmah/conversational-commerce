@@ -42,28 +42,30 @@ sequenceDiagram
     Frontend->>SSE_API: Continue conversation
 ```
 
-## Features
-
-- **[Next.js 15](https://nextjs.org/)** - The React framework for production
-- **[React 19](https://react.dev/)** - The library for web and native user interfaces
-- **[TypeScript](https://www.typescriptlang.org/)** - JavaScript with syntax for types
-- **[TailwindCSS 4](https://tailwindcss.com/)** - A utility-first CSS framework
-- **[shadcn/ui](https://ui.shadcn.com/)** - Beautifully designed components built with Radix UI and Tailwind CSS
-- **[next-themes](https://github.com/pacocoursey/next-themes)** - Perfect dark mode for Next.js
-- **[Biome](https://biomejs.dev/)** - Fast linter and formatter for JavaScript, TypeScript, JSX, and more
-- **[Lefthook](https://github.com/evilmartians/lefthook)** - Git hooks manager
-- **[PNPM](https://pnpm.io/)** - Fast, disk space efficient package manager
-- **[Turbopack](https://turbo.build/pack)** - Incremental bundler for development
-- **[Geist Fonts](https://vercel.com/font/geist)** - Beautiful, modern typeface by Vercel
-- **[Vitest](https://vitest.dev/)** - Fast unit/integration testing framework
-- **[@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/)** - Simple and complete React DOM testing utilities
-
 ## Getting Started
 
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v22 or newer)
 - [PNPM](https://pnpm.io/) (v10 or newer)
+- OpenAI API Key
+
+### Setup
+
+1. Install dependencies:
+```bash
+pnpm install
+```
+
+2. Copy environment variables:
+```bash
+cp .env.example .env.local
+```
+
+3. Add your OpenAI API key to `.env.local`:
+```
+OPENAI_API_KEY=your_openai_api_key_here
+```
 
 ### Development
 
@@ -73,7 +75,37 @@ Start the development server with Turbopack:
 pnpm dev
 ```
 
-Your application will be available at [http://localhost:3000](http://localhost:3000).
+The chat interface will be available at [http://localhost:3000](http://localhost:3000).
+
+## API Endpoints
+
+### 1. Chat Interface (AI SDK Streaming)
+- **URL**: `/api/chat/stream`  
+- **Method**: POST
+- **Usage**: Used by the React chat interface with AI SDK hooks
+- **Format**: AI SDK data stream protocol
+
+### 2. Server-Sent Events (SSE)
+- **URL**: `/api/sse`
+- **Method**: POST  
+- **Content-Type**: `text/event-stream`
+- **Usage**: Traditional SSE endpoint for external integrations
+- **Demo**: Available at [http://localhost:3000/sse-demo](http://localhost:3000/sse-demo)
+
+**SSE Event Types:**
+- `connected` - Initial connection established
+- `typing` - AI is processing the request  
+- `chunk` - Streaming text content
+- `completed` - Response finished with summary
+- `error` - Error occurred during processing
+- `[DONE]` - Final termination signal
+
+**Example SSE Request:**
+```bash
+curl -X POST http://localhost:3000/api/sse \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Where is my order R156998803 for mobile.developer+22@on-running.com?"}'
+```
 
 ### Build for Production
 
@@ -81,119 +113,3 @@ Your application will be available at [http://localhost:3000](http://localhost:3
 pnpm build
 ```
 
-### Start Production Server
-
-```bash
-pnpm start
-```
-
-### Linting
-
-```bash
-# Check for linting issues
-pnpm lint
-
-# Fix linting issues
-pnpm lint:fix
-```
-
-### Testing
-
-Run tests with Vitest and @testing-library/react:
-
-```bash
-pnpm test
-```
-
-For the interactive UI:
-
-```bash
-pnpm test:ui
-```
-
-To check coverage:
-
-```bash
-pnpm test:coverage
-```
-
-Test files are located in the `test/` directory. See `test/home.test.tsx` for an example.
-
-## Project Structure
-
-```shell
-nextjs_boilerplate/
-├── public/                # Static assets
-├── src/
-│   ├── app/               # App router pages and layouts
-│   │   ├── globals.css    # Global styles
-│   │   ├── layout.tsx     # Root layout
-│   │   ├── page.tsx       # Home page
-│   │   └── favicon.ico    # Favicon
-│   ├── components/        # React components
-│   │   ├── ui/            # shadcn/ui components
-│   │   ├── theme-provider.tsx # Theme provider wrapper
-│   │   └── theme-switcher.tsx # Dark/light mode toggle
-│   └── lib/               # Utility functions
-│       └── utils.ts       # Class name utility
-├── test/                  # Vitest and Testing Library tests
-│   ├── home.test.tsx      # Example test for Home page
-│   └── setup.ts           # Test setup file
-├── .gitignore             # Git ignore file
-├── biome.json             # Biome configuration
-├── components.json        # UI components configuration
-├── lefthook.yml           # Git hooks configuration
-├── next.config.ts         # Next.js configuration
-├── next-env.d.ts          # Next.js type definitions
-├── package.json           # Project dependencies and scripts
-├── pnpm-lock.yaml         # Lockfile for pnpm
-├── pnpm-workspace.yaml    # pnpm workspace configuration
-├── postcss.config.mjs     # PostCSS configuration
-├── README.md              # Project documentation
-├── tsconfig.json          # TypeScript configuration
-├── vitest.config.ts       # Vitest configuration
-└── .nvmrc                 # Node version
-```
-
-## Git Hooks
-
-This boilerplate uses Lefthook to manage Git hooks:
-
-- **pre-commit**: Automatically formats and lints staged files using Biome
-- **pre-push**: Checks files for linting issues before pushing
-
-## Customization
-
-### TailwindCSS
-
-The project uses TailwindCSS 4 with a custom configuration. You can modify the theme in `src/app/globals.css`.
-
-### Biome
-
-Biome is configured in `biome.json`. You can adjust linting and formatting rules to match your preferences.
-
-### Next.js
-
-Customize your Next.js configuration in `next.config.ts`.
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- [Next.js](https://nextjs.org/)
-- [TailwindCSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [Biome](https://biomejs.dev/)
-- [Lefthook](https://github.com/evilmartians/lefthook)
-- [Vitest](https://vitest.dev/)
-- [@testing-library/react](https://testing-library.com/docs/react-testing-library/intro/)
