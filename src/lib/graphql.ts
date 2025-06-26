@@ -2,7 +2,7 @@ import { ApolloClient, gql, InMemoryCache } from "@apollo/client";
 import type { OrderStatus, OrderStatusRequest } from "@/types";
 
 const client = new ApolloClient({
-  uri: "https://graphql-staging.on.com",
+  uri: process.env.GRAPHQL_ENDPOINT || "",
   cache: new InMemoryCache(),
 });
 
