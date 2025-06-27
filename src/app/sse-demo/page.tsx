@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useId, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,6 +18,15 @@ export default function SSEDemo() {
 
     setMessages([]);
     setIsConnected(true);
+
+    // Track SSE started event with relevant metadata
+    if (typeof posthog.capture === "function") {
+      posthog.capture("SSE started", {
+        input,
+        apiKeyPresent: !!apiKey.trim(),
+        timestamp: Date.now(),
+      });
+    }
 
     try {
       const headers: Record<string, string> = {

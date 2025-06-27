@@ -1,6 +1,7 @@
 "use client";
 
 import { useChat } from "@ai-sdk/react";
+import posthog from "posthog-js";
 import { Card } from "@/components/ui/card";
 import { MessageInput } from "./message-input";
 import { MessageList } from "./message-list";
@@ -9,9 +10,11 @@ export function ChatInterface() {
   const { messages, input, handleInputChange, handleSubmit, status } = useChat({
     api: "/api/chat/stream",
     onFinish: (message) => {
+      posthog.capture("chat_message_finished", message);
       console.log("🏁 Client: Message finished:", message);
     },
     onError: (error) => {
+      posthog.capture("chat_message_error", error);
       console.error("💥 Client: Error:", error);
     },
   });
